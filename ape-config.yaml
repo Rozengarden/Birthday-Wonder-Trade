@@ -1,0 +1,9 @@
+name: Birthday Wonder Trade
+
+default_ecosystem: base
+
+dependencies:
+  - python: snekmate
+
+plugins:
+  - name: base
