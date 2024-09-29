@@ -2,8 +2,12 @@ name: Birthday Wonder Trade
 
 default_ecosystem: base
 
+vyper:
+  version: 0.4.0
+
 dependencies:
   - python: snekmate
 
 plugins:
   - name: base
+  - name: ledger

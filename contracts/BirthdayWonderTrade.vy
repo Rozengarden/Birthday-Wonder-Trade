@@ -18,8 +18,6 @@ from ethereum.ercs import IERC20
 _SUPPORTED_INTERFACES: constant(bytes4[1]) = [0x01FFC9A7]
 # storing the collection address
 COLLECTION: immutable(IERC1155)
-# the address to receive the rescued funds
-RESCUE: immutable(address)
 # the address alllowed to save the funds
 ADMIN: immutable(address)
 # boolean to see if the contract been seeded or not
@@ -30,9 +28,8 @@ seeder: public(address)
 storedId: public(uint256)
 
 @deploy
-def __init__(_birthday_card_address: address, _rescue_address: address):
+def __init__(_birthday_card_address: address):
     COLLECTION = IERC1155(_birthday_card_address)
-    RESCUE = _rescue_address
     ADMIN = msg.sender
     self.isSeeded = False
 
@@ -109,6 +106,7 @@ def onERC1155BatchReceived(_operator: address, _from: address, _ids: DynArray[ui
     """
     raise "Only support one token at a time"
 
+@external
 def withdraw() -> bool:
     """
     @dev Allow the one hat seeded the contract to get the stored NFT
@@ -119,6 +117,7 @@ def withdraw() -> bool:
     self.isSeeded = False
     return True
 
+@external
 def save20(_address: address, _amount: uint256) -> bool:
     """
     @dev allow the admin to rescue stuck fund to rescue address
@@ -127,4 +126,16 @@ def save20(_address: address, _amount: uint256) -> bool:
     @return bool wether transfer been successful
     """
     assert msg.sender == ADMIN, "only the admin can rescue funds"
-    return extcall IERC20(_address).transfer(RESCUE, _amount)
+    return extcall IERC20(_address).transfer(ADMIN, _amount)
+
+@external
+def save712(_address: address, _amount: uint256) -> bool:
+    """
+    @dev allow the admin to rescue stuck fund to rescue address
+    @param _address the address of the rescued erc712 token
+    @param _amount the amount of rescued erc712 token
+    @return bool wether transfer been successful
+    """
+    assert msg.sender == ADMIN, "only the admin can rescue funds"
+    extcall IERC721(_address).transferFrom(self, ADMIN, _amount)
+    return True
