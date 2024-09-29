@@ -69,6 +69,7 @@ def onERC1155Received(_operator: address, _from: address, _id: uint256, _value: 
            with no specified format.
     @return bytes4 The 4-byte function selector of `onERC1155Received`.
     """
+    assert msg.sender == COLLECTION.address, "Only support one collection"
     assert _value == 1, "Only support one token at a time"
     if self.isSeeded:
         extcall COLLECTION.safeTransferFrom(self, _from, self.storedId, 1, empty(Bytes[1_024]))
