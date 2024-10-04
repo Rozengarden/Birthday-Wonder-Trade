@@ -62,9 +62,17 @@ def test_withdraw_after_exchange(test_main, trade, YBC, alice):
     assert not trade.isSeeded()
     assert trade.seeder() == alice
 
+def test_unauthorized_withdraw(test_seed, trade, YBC, macci, alice):
+    before = YBC.balanceOf(macci, TOKEN_ID1)
+    with reverts("revert: Only for the seeder"):
+        trade.withdraw(sender=macci)
+    assert YBC.balanceOf(macci, TOKEN_ID1) - before == 0
+    assert trade.isSeeded()
+    assert trade.seeder() == alice
+
 
 # TODO:
 # different erc1155 collection
-# test withdraw with main & unauthorized withdraw
+# unauthorized withdraw
 # test sending multiple token and batch
 # test rescue function
