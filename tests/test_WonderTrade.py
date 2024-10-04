@@ -3,6 +3,7 @@ import pytest
 
 TOKEN_ID1=19
 TOKEN_ID2=1
+TOKEN_ID3=2
 
 @pytest.fixture
 def alice(accounts):
@@ -22,8 +23,7 @@ def trade(project, alice, YBC):
 def macci(YBC, alice):
     a = accounts["0xA8a849b09AA9bf62782AB572f09FF479B76EBaC8"]
     a.balance = 1000000000000000000000
-    YBC.mintBaseExisting([alice], [TOKEN_ID1], [1], sender=a)
-    YBC.mintBaseExisting([a], [TOKEN_ID2], [1], sender=a)
+    YBC.mintBaseExisting([alice, a, a], [TOKEN_ID1, TOKEN_ID2, TOKEN_ID3], [5, 5, 5], sender=a)
     return a
 
 @pytest.fixture
@@ -70,9 +70,16 @@ def test_unauthorized_withdraw(test_seed, trade, YBC, macci, alice):
     assert trade.isSeeded()
     assert trade.seeder() == alice
 
+def test_multisend(test_seed, trade, macci, YBC):
+    with reverts("revert: Only support one token at a time"):
+        YBC.safeTransferFrom(macci, trade, TOKEN_ID2, 0, 0, sender=macci)
+    with reverts("revert: Only support one token at a time"):
+        YBC.safeTransferFrom(macci, trade, TOKEN_ID2, 2, 0, sender=macci)
+
+def test_batchsend(test_seed, trade, macci, YBC):
+    with reverts("revert: Only support one token at a time"):
+        YBC.safeBatchTransferFrom(macci, trade, [TOKEN_ID2, TOKEN_ID3], [1, 1], 0, sender=macci)
 
 # TODO:
 # different erc1155 collection
-# unauthorized withdraw
-# test sending multiple token and batch
 # test rescue function
