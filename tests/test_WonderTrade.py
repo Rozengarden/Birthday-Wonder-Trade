@@ -31,6 +31,13 @@ def macci(YBC, alice):
     return a
 
 @pytest.fixture
+def mock_erc1155(alice):
+    """deploy a mock erc1155 contract"""
+    mock = alice.deploy(project.erc1155_mock, "")
+    mock._customMint(alice, 1, 1, sender=alice)
+    return mock
+
+@pytest.fixture
 def test_seed(trade, alice, macci, YBC):
     """Seed test contract"""
     before = YBC.balanceOf(alice, TOKEN_ID1)
@@ -97,6 +104,10 @@ def test_rescue(trade, alice, YBC):
         trade.save20(YBC, 1, sender=alice)
     with reverts():
         trade.save712(YBC, 1, sender=alice)
+
+def test_other_collection(trade, mock_erc1155, alice, test_seed):
+    with reverts("revert: Only support one collection"):
+        mock_erc1155.safeTransferFrom(alice, trade, 1, 1, 0, sender=alice)
 
 # TODO:
 # different erc1155 collection

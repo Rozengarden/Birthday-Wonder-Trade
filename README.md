@@ -11,6 +11,7 @@ Clone the repository and navigate into the repository folder.
 Install the required ape plugin.
 ```
 ape plugin install .
+pip install snekmate
 ```
 
 Compile the contract.
