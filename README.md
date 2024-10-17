@@ -26,10 +26,10 @@ ape test --network :mainnet-fork:foundry
 
 Deploy it in a fork.
 ```
-ape script deploy.py --network :mainnet-fork:foundry
+ape run deploy.py --network :mainnet-fork:foundry
 ```
 
 Deploy it for real.
 ```
-ape script deploy.py --network :mainnet:node
+ape run deploy.py --network :mainnet:node
 ```
